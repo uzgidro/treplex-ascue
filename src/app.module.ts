@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { HttpModule } from '@nestjs/axios';
+import { FetchService } from './fetch.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [],
+  imports: [HttpModule, ConfigModule.forRoot({})],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, FetchService],
 })
 export class AppModule {}
