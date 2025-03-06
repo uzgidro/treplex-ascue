@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { FetchService } from './fetch.service';
 import { Characteristic } from './interfaces/characteristic';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class AppService {
   private readonly CONST: number = 1000000;
   private readonly KVT: number = 1000;
 
-  constructor(private fetchService: FetchService) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private fetchService: FetchService,
+  ) {}
 
   getHello(): string {
     return 'Hello World!';
@@ -18,7 +22,10 @@ export class AppService {
 
     const ohangaronMap = this.setDataMap(data);
 
-    console.log(this.setupOhangaron(ohangaronMap));
+    let ohangaron = this.setupOhangaron(ohangaronMap);
+
+    await this.cacheManager.set('ohangaron', ohangaron);
+    console.log(ohangaron);
   }
 
   // Setup region
