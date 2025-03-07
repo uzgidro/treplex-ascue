@@ -38,8 +38,8 @@ export class AppService {
 
   // Setup region
 
-  private async setupOhangaron() {
-    try {
+  private setupOhangaron() {
+    return this.withErrorHandling(async () => {
       const data = await this.fetchService.getOhangaron();
 
       const map = this.setDataMap(data);
@@ -48,18 +48,7 @@ export class AppService {
       const ertosh = this.setupErtosh(map);
 
       return this.calculateRegion([ges35, ertosh]);
-    } catch (e) {
-      return {
-        active: 0,
-        reactive: 0,
-        activeIn: 0,
-        activeOut: 0,
-        ownNeeds: 0,
-        inWork: 0,
-        pending: 0,
-        inRepair: 0,
-      } satisfies Characteristic;
-    }
+    });
   }
 
   // Setup GES
@@ -163,5 +152,22 @@ export class AppService {
       acc.inRepair += item.inRepair; // Суммируем inWork
       return acc;
     });
+  }
+
+  private async withErrorHandling(logic: () => Promise<Characteristic>) {
+    try {
+      return await logic(); // Выполняем переданную логику
+    } catch (e) {
+      return {
+        active: 0,
+        reactive: 0,
+        activeIn: 0,
+        activeOut: 0,
+        ownNeeds: 0,
+        inWork: 0,
+        pending: 0,
+        inRepair: 0,
+      } satisfies Characteristic;
+    }
   }
 }
