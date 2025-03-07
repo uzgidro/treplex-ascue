@@ -22,10 +22,7 @@ export class AppService {
 
     const ohangaronMap = this.setDataMap(data);
 
-    let ohangaron = this.setupOhangaron(ohangaronMap);
-
-    await this.cacheManager.set('ohangaron', ohangaron);
-    console.log(ohangaron);
+    return  this.setupOhangaron(ohangaronMap);
   }
 
   // Setup region

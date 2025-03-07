@@ -7,7 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EnvService } from './env.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv, Keyv } from '@keyv/redis';
-import {CacheableMemory} from 'cacheable'
+import { CacheableMemory } from 'cacheable';
 
 @Module({
   imports: [
@@ -19,10 +19,8 @@ import {CacheableMemory} from 'cacheable'
           stores: [
             new Keyv({
               store: new CacheableMemory({ ttl: 60000, lruSize: 5000 }),
-              serialize: JSON.stringify,
-              deserialize: JSON.parse
             }),
-            createKeyv('redis://localhost:6379'),
+            createKeyv('redis://127.127.126.48:6379'),
           ],
         };
       },
