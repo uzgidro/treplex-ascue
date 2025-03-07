@@ -8,17 +8,22 @@ import { EnvService } from './env.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     HttpModule,
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
     CacheModule.registerAsync({
+      isGlobal: true,
       useFactory: async () => {
         return {
           stores: [
             new Keyv({
-              store: new CacheableMemory({ ttl: 60000, lruSize: 5000 }),
+              deserialize: JSON.parse,
+              serialize: JSON.stringify,
+              store: new CacheableMemory({ ttl: 120000, lruSize: 5000 }),
             }),
             createKeyv('redis://127.127.126.48:6379'),
           ],

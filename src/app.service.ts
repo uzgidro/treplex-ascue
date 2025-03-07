@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { FetchService } from './fetch.service';
 import { Characteristic } from './interfaces/characteristic';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class AppService {
@@ -18,20 +19,47 @@ export class AppService {
   }
 
   async getData() {
-    const data = await this.fetchService.getOhangaron();
+    let dataFromRedis = await this.cacheManager.get<Characteristic>('site');
+    if (dataFromRedis) {
+      return dataFromRedis;
+    } else {
+      return this.updateData();
+    }
+  }
 
-    const ohangaronMap = this.setDataMap(data);
+  @Cron('0 * * * * *')
+  async updateData() {
+    const ohangaron = await this.setupOhangaron();
 
-    return  this.setupOhangaron(ohangaronMap);
+    await this.cacheManager.set<Characteristic>('site', ohangaron);
+
+    return ohangaron;
   }
 
   // Setup region
 
-  private setupOhangaron(map: Map<string, number>): Characteristic {
-    const ges35 = this.setupGes35(map);
-    const ertosh = this.setupErtosh(map);
+  private async setupOhangaron() {
+    try {
+      const data = await this.fetchService.getOhangaron();
 
-    return this.calculateRegion([ges35, ertosh]);
+      const map = this.setDataMap(data);
+
+      const ges35 = this.setupGes35(map);
+      const ertosh = this.setupErtosh(map);
+
+      return this.calculateRegion([ges35, ertosh]);
+    } catch (e) {
+      return {
+        active: 0,
+        reactive: 0,
+        activeIn: 0,
+        activeOut: 0,
+        ownNeeds: 0,
+        inWork: 0,
+        pending: 0,
+        inRepair: 0,
+      } satisfies Characteristic;
+    }
   }
 
   // Setup GES
