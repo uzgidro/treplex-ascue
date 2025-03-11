@@ -1,0 +1,58 @@
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+
+/** @var yii\web\View $this */
+/** @var common\models\TransformerSearch $model */
+/** @var yii\widgets\ActiveForm $form */
+?>
+
+<div class="transformer-search">
+
+    <?php $form = ActiveForm::begin([
+        'action' => ['index'],
+        'method' => 'get',
+        'options' => [
+            'data-pjax' => 1
+        ],
+    ]); ?>
+
+    <?= $form->field($model, 'id') ?>
+
+    <?= $form->field($model, 'id_organization') ?>
+
+    <?= $form->field($model, 'id_org') ?>
+
+    <?= $form->field($model, 'small_type') ?>
+
+    <?= $form->field($model, 'type') ?>
+
+    <?php // echo $form->field($model, 'year_of_issue') ?>
+
+    <?php // echo $form->field($model, 'year_of_commissioning') ?>
+
+    <?php // echo $form->field($model, 'power') ?>
+
+    <?php // echo $form->field($model, 'voltage') ?>
+
+    <?php // echo $form->field($model, 'loss_of_idle_speed') ?>
+
+    <?php // echo $form->field($model, 'overall_dimensions') ?>
+
+    <?php // echo $form->field($model, 'winding_connection') ?>
+
+    <?php // echo $form->field($model, 'gross_weight') ?>
+
+    <?php // echo $form->field($model, 'gross_oil_weight') ?>
+
+    <?php // echo $form->field($model, 'photo') ?>
+
+    <div class="form-group">
+        <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
+        <?= Html::resetButton('Reset', ['class' => 'btn btn-outline-secondary']) ?>
+    </div>
+
+    <?php ActiveForm::end(); ?>
+
+</div>

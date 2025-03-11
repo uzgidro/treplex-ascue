@@ -1,0 +1,241 @@
+$url = "http://10.151.170.10:8080/api/v1/water-level-gauges/reservoir/measurements/latest?secret_key=g3fXbUlLCV";
+
+try {
+    $client = new Client();
+    // Create and send the request with a 5-second timeout
+    $request = new Request('GET', $url);
+    $res = $client->sendAsync($request, ['timeout' => 5])->wait();
+
+    // Retrieve and decode the response body
+    $body = $res->getBody();
+    $array = json_decode($body, true);
+
+    // Validate JSON decoding
+    if (json_last_error() === JSON_ERROR_NONE) {
+        // Cache the result for 10 minutes (600 seconds)
+        $result = $array['data']['upper'];
+//        print_r($result);
+
+
+        if ($result[0]['virtualPressure'] > 0) {
+            echo $result[0]['hydroPressure'];
+        } else if ($result[1]['virtualPressure'] > 0) {
+            echo $result[0]['hydroPressure'];
+        } else {
+            echo $result[2]['hydroPressure'];
+        }
+        echo"<pre>";
+        print_r($result);
+        echo"</pre>";
+    } else {
+        // Handle invalid JSON
+        echo 0;
+    }
+} catch (\GuzzleHttp\Exception\RequestException $e) {
+    // Handle exceptions (e.g., timeout, network errors)
+    echo 0;
+}
+
+
+
+/******************************dashboard
+<script>
+                            /*suv omborlari*/
+                            // Themes begin
+                            am4core.useTheme(am4themes_animated);
+                            // Themes end
+
+                            // Create chart instance
+                            var chart = am4core.create("chartdiv3", am4charts.XYChart);
+                            // Add data
+                            chart.data = [{
+                              "title": "Андижон",
+                              "level": 891.39,
+                              "volume": 1175.4,
+                            },{
+                              "title": "Оҳангарон",
+                               "level": 1032.38,
+                              "volume": 46.6,
+                            },{
+                              "title": "Сардоба",
+                              "level": 285.81,
+                              "volume": 266.6,
+                            },{
+                              "title": "Ҳисорак",
+                              "level": 1081.94,
+                              "volume": 60.4,
+                            },{
+                              "title": "Тўполанг",
+                              "level": 909.68,
+                              "volume": 187.8,
+                            },{
+                              "title": "Чорвоқ",
+                               "level": 863.79,
+                               "volume": 1086.7,
+                            }];
+
+                            // Create axes
+                            var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+                            categoryAxis.dataFields.category = "title";
+                            categoryAxis.numberFormatter.numberFormat = "#";
+                            categoryAxis.renderer.inversed = true;
+                            categoryAxis.renderer.grid.template.location = 0;
+                            categoryAxis.renderer.cellStartLocation = 0.1;
+                            categoryAxis.renderer.cellEndLocation = 0.9;
+
+                            var  valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+                            valueAxis.renderer.opposite = true;
+
+                            // Create series
+                            function createSeries(field, name) {
+                              var series = chart.series.push(new am4charts.ColumnSeries());
+                              series.dataFields.valueX = field;
+                              series.dataFields.categoryY = "title";
+                              series.name = name;
+                              series.columns.template.tooltipText = "{name}: [bold]{valueX}[/]";
+                              series.columns.template.height = am4core.percent(100);
+                              series.sequencedInterpolation = true;
+
+                              var valueLabel = series.bullets.push(new am4charts.LabelBullet());
+                              valueLabel.label.text = "{valueX}";
+                              valueLabel.label.horizontalCenter = "left";
+                              valueLabel.label.dx = 10;
+                              valueLabel.label.hideOversized = false;
+                              valueLabel.label.truncate = false;
+
+                              var categoryLabel = series.bullets.push(new am4charts.LabelBullet());
+                              categoryLabel.label.text = "{name}";
+                              categoryLabel.label.horizontalCenter = "right";
+                              categoryLabel.label.dx = -10;
+                              categoryLabel.label.fill = am4core.color("#fff");
+                              categoryLabel.label.hideOversized = false;
+                              categoryLabel.label.truncate = false;
+                            }
+
+                            createSeries("level", "Income");
+                            createSeries("volume", "Expenses");
+
+                            // // Add data
+                            // chart.data = [{
+                            //   "title": "Андижон",
+                            //   "level": 891.39,
+                            //   "volume": 1175.4,
+                            //   "arrival": 58,
+                            //   "exit": 9
+                            // }, {
+                            //   "title": "Оҳангарон",
+                            //   "level": 1032.38,
+                            //   "volume": 46.6,
+                            //   "arrival": 8.4,
+                            //   "exit": 4.2
+                            // }, {
+                            //   "title": "Сардоба",
+                            //   "level": 285.81,
+                            //   "volume": 266.6,
+                            //   "arrival": 55,
+                            //   "exit": 55
+                            // }, {
+                            //   "title": "Ҳисорак",
+                            //   "level": 1081.94,
+                            //   "volume": 60.4,
+                            //   "arrival": 2.6,
+                            //   "exit": 0
+                            // }, {
+                            //   "title": "Тўполанг",
+                            //   "level": 909.68,
+                            //   "volume": 187.8,
+                            //   "arrival": 9,
+                            //   "exit": 30
+                            // }, {
+                            //   "title": "Чорвоқ",
+                            //   "level": 863.79,
+                            //   "volume": 1086.7,
+                            //   "arrival": 60,
+                            //   "exit": 0
+                            // }];
+                            //
+                            // // Create axes
+                            // var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+                            // categoryAxis.dataFields.category = "title";
+                            // categoryAxis.renderer.grid.template.location = 0;
+                            // categoryAxis.renderer.labels.template.fill = am4core.color("#fff"); // Красный цвет текста
+                            // // Изменение размера шрифта для категорийной оси
+                            // categoryAxis.renderer.labels.template.fontSize = 12; // Устанавливает размер шрифта в 14px
+                            //
+                            // // categoryAxis.renderer.labels.template.rotation = -45; // Поворачивает текст на 45 градусов
+                            // // categoryAxis.renderer.labels.template.horizontalCenter = "right"; // Выравнивает текст справа
+                            // // categoryAxis.renderer.labels.template.verticalCenter = "middle"; // Выравнивает по вертикали
+                            // categoryAxis.renderer.minGridDistance = 40; // Уменьшает минимальное расстояние между метками
+                            //
+                            // var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                            // valueAxis.renderer.inside = true;
+                            // valueAxis.renderer.labels.template.disabled = true;
+                            // valueAxis.min = 0;
+                            // valueAxis.renderer.labels.template.fill = am4core.color("#ff0000"); // Зеленый цвет текста
+                            //
+                            // // Create series
+                            // function createSeries(field, name) {
+                            //
+                            //   // Set up series
+                            //   var series = chart.series.push(new am4charts.ColumnSeries());
+                            //   series.name = name;
+                            //   series.dataFields.valueY = field;
+                            //   series.dataFields.categoryX = "title";
+                            //   series.sequencedInterpolation = true;
+                            //
+                            //   // Make it stacked
+                            //   series.stacked = true;
+                            //
+                            //   // Configure columns
+                            //   series.columns.template.width = am4core.percent(60);
+                            //   series.columns.template.tooltipText = "[#fff]{name}[/]\n[font-size:12px]{categoryX}: {valueY}"; // Красный цвет
+                            //   series.columns.template.stroke = am4core.color("transparent"); // Убирает видимую границу
+                            //   series.columns.template.strokeWidth = 0; // Устанавливает ширину границы в 0
+                            //
+                            //
+                            //   // Add label
+                            //   var labelBullet = series.bullets.push(new am4charts.LabelBullet());
+                            //   labelBullet.label.text = "{valueY}";
+                            //   labelBullet.locationY = 0.5;
+                            //   labelBullet.label.hideOversized = true;
+                            //   labelBullet.label.fill = am4core.color("#fff"); // Синий цвет текста
+                            //   labelBullet.label.fontSize = 12;
+                            //
+                            //   return series;
+                            // }
+                            //
+                            //
+                            //
+                            // createSeries("level", "сувнинг сатҳи");
+                            // createSeries("volume", "ҳажми, млн.м3");
+                            // createSeries("arrival", "келиши, м3/сек");
+                            // createSeries("exit", "чиқиши, м3/сек");
+                            //
+                            // // Legend
+                            // chart.legend = new am4charts.Legend();
+                            // chart.legend.labels.template.fill = am4core.color("#fff"); // Красный цвет текста
+                            // chart.legend.labels.template.fontSize = 14; // Размер шрифта для меток
+                            // chart.legend.valueLabels.template.fontSize = 14; // Размер шрифта для значений
+                            //
+                            // // Цвет для первой группы
+                            // chart.series.values[0].legendSettings.labelText = "{name}";
+                            // chart.series.values[0].fill = am4core.color("#0d92f8"); // Оранжевый цвет группы
+                            //
+                            // // Цвет для второй группы
+                            // chart.series.values[1].legendSettings.labelText = "{name}";
+                            // chart.series.values[1].fill = am4core.color("#034374"); // Зеленый цвет группы
+                            //
+                            // // Цвет для третьей группы
+                            // chart.series.values[2].legendSettings.labelText = "{name}";
+                            // chart.series.values[2].fill = am4core.color("#70bffb"); // Синий цвет группы
+                            //
+                            // // Цвет для четвертой группы
+                            // chart.series.values[3].legendSettings.labelText = "{name}";
+                            // chart.series.values[3].fill = am4core.color("#044c84"); // Желтый цвет группы
+
+                            // chart.series.values.forEach(series => {
+                            //     series.legendSettings.marker.fill = series.fill; // Используем тот же цвет, что и для серии
+                            // });
+
+                        </script>
+                        <div id="chartdiv3" style="height: 300px;width:100%;"></div>
